@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
       },
       {
         model: Tag,
-        attributes: ['id, 'tag_name']
+        attributes: ['id', 'tag_name']
       }
     ]
   })
@@ -144,7 +144,7 @@ router.delete('/:id', (req, res) => {
     }
   })
     .then(dbProductData => {
-      if (!dbProductData) => {
+      if (!dbProductData)  {
         res.status(404).json({message: 'no product found with this id'});
         return;
       }

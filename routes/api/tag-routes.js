@@ -31,11 +31,11 @@ router.get('/:id', (req, res) => {
     include: [
       {
         model: Product,
-        attributes: ['id', 'product_name', 'price', 'stock', 'category_id'],
+        attributes: ['id', 'product_name', 'price', 'stock', 'category_id']
       }
     ]
   })
-    .suppressUnhandledRejections(dbTagData => {
+    .then(dbTagData => {
       if(!dbTagData) {
         res.status(404).json({message: 'no tag found with this id'});
         return;
@@ -57,39 +57,47 @@ router.post('/', (req, res) => {
   .catch(err => {
     console.log(err);
     res.status(500).json
-  })
+  });
+  });
 
-router.put('/:id',     (req, res) => {
+router.put('/:id',(req, res) => {
   // update a tag's name by its `id` value
-  const tagData = await Tag.update(
-    {
-      tag_name: req.body.tag_name,
-    },
-    {
-      where: {
-        id: req.params.id
-      },
+  Tag.update(req.body, {
+    where: {
+      id: req.params.id
     }
-  );
-  return res.json(tagData)
-});
-
-router.delete('/:id',     (req, res) => {
-  // delete on tag by its `id` value
-  try {
-    const tagData = await Tag.destroy({
-      where: {
-        id: req.params.id
+  })
+    .then(dbTagData => {
+      if (!dbTagData[0]) {
+        res.status(404).json({message: 'No tag found with this id'});
+        return;
       }
+      res.json(dbTagData);
+    })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+      });
     });
-    if(!tagData) {
-      res.status(404).json({message: 'no tage found with this id'});
-      return;
+
+router.delete('/:id',(req, res) => {
+  // delete on tag by its `id` value
+  tag.destroy({
+    where: {
+      id: req.params.id
     }
-    res.status(200).json(tagData);
-  } catch (err) {
-    res.status(500).json(err);
+  })
+  .then(dbTagData => {
+    if(!dbTagData) {
+    res.status(404).json({message: 'no tag found with this id'});
+    return;
   }
+  res.json(dbTagData);
+})
+  .catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
 });
 
 module.exports = router;
